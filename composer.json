@@ -1,0 +1,13 @@
+{
+  "autoload": {
+    "psr-4": {
+      "ClasseTechnique\\": "src/ClasseTechnique/",
+      "ClasseMetier\\": "src/ClasseMetier/"
+    }
+  },
+    "require": {
+      "ext-json": "*",
+        "mpdf/mpdf": "^8.2",
+      "ext-pdo": "*"
+    }
+}

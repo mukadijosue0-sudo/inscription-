@@ -1,0 +1,50 @@
+<div class="page-card">
+    <div class="page-header">
+        <div class="page-header-top">
+            <h1 class="page-title">
+                Les inscriptions
+            </h1>
+            <div class="page-header-actions">
+                <a target="Demandes reçues" href="demandesrecues.php" class="btn btn-info">Demandes reçues</a>
+                <a target="Demandes relancées" href="demandesrelancees.php" class="btn btn-warning">Demandes relancées</a>
+                <a target="Dossiers acceptés" href="dossiersacceptes.php" class="btn btn-success">Dossiers acceptés</a>
+                <a target="Dossiers incomplets" href="dossiersincomplets.php" class="btn btn-danger">Dossiers incomplets</a>
+            </div>
+        </div>
+        <div class="page-header-filters"></div>
+    </div>
+    <div class="page-body">
+        <div id="msg" class="p-1"></div>
+        <!-- Conteneur avec scroll interne -->
+        <div class="table-container">
+            <table>
+                <thead>
+                <tr>
+                    <th>Étudiant</th>
+                    <th style="text-align:center;">Inscrit Le</th>
+                    <th style="text-align:center;">Relancé Le</th>
+                    <th>État</th>
+                    <th>Édition des courriers</th>
+                </tr>
+                </thead>
+                <tbody id="lesLignes"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Template d'une ligne d'élève -->
+<template id="tplLigneEleve">
+    <tr>
+        <td class="nom"></td>
+        <td class="date-inscription text-center"></td>
+        <td class="date-relance text-center"></td>
+        <td class="etat"></td>
+        <td class="actions">
+            <a class="btn btn-info btn-sm mx-1 btn-fiche" href="#">Fiche</a>
+            <a class="btn btn-warning btn-sm mx-1 btn-incomplet" href="#">Dossier incomplet</a>
+            <a class="btn btn-success btn-sm mx-1 btn-confirmation" href="#">Confirmation</a>
+            <a class="btn btn-danger btn-sm mx-1 btn-relance" href="#">Relance</a>
+        </td>
+    </tr>
+</template>

@@ -1,0 +1,40 @@
+<div class="page-card">
+    <div class="page-header">
+        <div class="page-header-top">
+            <h1 class="page-title">
+                Les pièces manquantes
+            </h1>
+        </div>
+    </div>
+    <div class="page-body">
+        <form id="formDossier" method="post" action="genererdossierincomplet.php" target="_blank">
+            <h1>Dossier de <span id="nom"></span></h1>
+            <div id="msg" class="erreur p-1"></div>
+            <fieldset>
+                <legend>Quelles sont les pièces non-rendues avec le dossier ?</legend>
+                <div id="listePieces"></div>
+            </fieldset>
+
+            <!-- Template pour une ligne de pièce (case à cocher + libellé + saut de ligne) -->
+            <template id="templatePiece">
+                <label class="d-block mb-2">
+                    <input type="checkbox" class="form-check-input my-auto m-3" style="width: 25px; height: 25px;">
+                    <span class="libelle-piece"></span>
+                </label>
+            </template>
+
+            <!-- Champs cachés pour transmettre les données -->
+            <input type="hidden" name="idDossier" id='idDossier' >
+            <input type="hidden" name="pieces" id="pieces">
+
+            <div class="d-flex justify-content-evenly">
+                <button id='btnValider' class="btn btn-sm btn-danger" type="submit">
+                    Valider
+                </button>
+                <a href="../.." class="btn btn-sm btn-success">
+                    Quitter
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
