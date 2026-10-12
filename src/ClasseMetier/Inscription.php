@@ -53,12 +53,18 @@ SQL;
      * @return array
      */
 
+
     public static function getLesDossiersIncomplets(): array
     {
-
-
-
-
+        $sql = <<<SQL
+            SELECT dossier.id, nom, prenom, piece.libelle
+            FROM dossier
+                JOIN piece_manquante ON piece_manquante.id_dossier = dossier.id
+                JOIN piece ON piece.id = piece_manquante.id_piece
+            ORDER BY nom, prenom, dossier.id, piece.id;
+SQL;
+        $select = new Select();
+        return $select->getRows($sql);
     }
 
 
@@ -87,8 +93,13 @@ SQL;
      */
     public static function getLesPieces()
     {
-
-
+        $sql = <<<SQL
+            select id, libelle
+            from piece
+            order by id;
+SQL;
+        $select = new Select();
+        return $select->getRows($sql);
     }
 
     /**
@@ -96,7 +107,7 @@ SQL;
      * @param int $id
      * @return array
      */
-    public static function getById(int $id): array | null
+    public static function getById(int $id): array|null
     {
         $sql = <<<SQL
             SELECT dossier.id,  nom, prenom, sexe, nom_responsable, titre_responsable, rue_responsable, 
@@ -115,7 +126,6 @@ SQL;
     }
 
 
-
     /**
      * Récupération des pièces manquantes pour l'élève passé en paramètre
      * @param int $id
@@ -123,8 +133,15 @@ SQL;
      */
     public static function getLesPiecesManquantes(int $id)
     {
-
-
+        $sql = <<<SQL
+            select piece.id, piece.libelle
+            from piece_manquante
+                join piece on piece.id = piece_manquante.id_piece
+            where piece_manquante.id_dossier = :id
+            order by piece.id;
+SQL;
+        $select = new Select();
+        return $select->getRows($sql, ['id' => $id]);
     }
 
     /**
@@ -133,12 +150,22 @@ SQL;
      */
     public static function confirmer(int $id)
     {
-        // Mise à jour de id_etat qui passe à 3
+        $db = Database::getInstance();
+        $db->beginTransaction();
+        try {
+            // Mise à jour de id_etat qui passe à 3
+            $cmd = $db->prepare('UPDATE dossier SET id_etat = 3 WHERE id = :id');
+            $cmd->execute(['id' => $id]);
 
+            // Suppression des éventuelles pièces manquantes
+            $cmd = $db->prepare('DELETE FROM piece_manquante WHERE id_dossier = :id');
+            $cmd->execute(['id' => $id]);
 
-        // Suppression des éventuelles pièces manquantes
-
-
+            $db->commit();
+        } catch (\Throwable $e) {
+            $db->rollBack();
+            throw $e;
+        }
     }
 
     /**
@@ -148,14 +175,31 @@ SQL;
      */
     public static function setIncomplet($id, $lesPieces)
     {
-        // Mise à jour de id_etat qui passe à 2
+        $db = Database::getInstance();
+        $db->beginTransaction();
+        try {
+            // Mise à jour de id_etat qui passe à 2
+            $cmd = $db->prepare('UPDATE dossier SET id_etat = 2 WHERE id = :id');
+            $cmd->execute(['id' => $id]);
 
+            // Suppression des éventuelles pièces manquantes précédentes
+            $cmd = $db->prepare('DELETE FROM piece_manquante WHERE id_dossier = :id');
+            $cmd->execute(['id' => $id]);
 
-        // Suppression des éventuelles pièces manquantes précédentes
+            // Mémorisation des pièces manquantes
+            $cmd = $db->prepare('INSERT INTO piece_manquante (id_dossier, id_piece) VALUES (:idDossier, :idPiece)');
+            foreach ($lesPieces as $piece) {
+                $cmd->execute([
+                    'idDossier' => $id,
+                    'idPiece' => (int)$piece['id']
+                ]);
+            }
 
-
-        // Mémorisation des pièces manquantes
-
+            $db->commit();
+        } catch (\Throwable $e) {
+            $db->rollBack();
+            throw $e;
+        }
     }
 
     /**
@@ -165,8 +209,9 @@ SQL;
      */
     public static function setRelance(int $id)
     {
-        // Mise à jour de id_etat qui passe à 1
-
+        // Mise à jour de id_etat qui passe à 1 et de date_relance qui reçoit la date du jour
+        $db = Database::getInstance();
+        $cmd = $db->prepare('UPDATE dossier SET id_etat = 1, date_relance = curdate() WHERE id = :id');
+        $cmd->execute(['id' => $id]);
     }
 }
-
